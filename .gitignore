@@ -31,3 +31,10 @@ build/
 tmp/
 temp/
 
+# Monitoring binaries (downloaded Prometheus/Grafana)
+monitoring-local/
+
+# Grafana data
+grafana_data/
+prometheus_data/
+

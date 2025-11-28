@@ -51,7 +51,7 @@ const corsConfig = cors({
 
     const allowedOrigins = process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(',')
-      : ['http://localhost:3000', 'http://localhost:3001'];
+      : ['http://localhost:4000', 'http://localhost:4001'];
 
     if (allowedOrigins.includes(origin) || config.app.isDevelopment) {
       callback(null, true);

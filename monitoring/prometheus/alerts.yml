@@ -1,0 +1,64 @@
+# Prometheus Alert Rules
+groups:
+  - name: node-app-alerts
+    rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(app_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | printf \"%.2f\" }} errors/sec"
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(app_http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value | printf \"%.2f\" }}s"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (app_memory_usage_custom_bytes{type="heapUsed"} / app_memory_usage_custom_bytes{type="heapTotal"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Heap usage is {{ $value | printf \"%.1f\" }}%"
+
+      # Application Down
+      - alert: ApplicationDown
+        expr: up{job="node-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Application is down"
+          description: "The Node.js application is not responding"
+
+      # High Event Loop Lag
+      - alert: HighEventLoopLag
+        expr: app_event_loop_lag_seconds > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High event loop lag"
+          description: "Event loop lag is {{ $value | printf \"%.3f\" }}s"
+
+      # Too Many Active Requests
+      - alert: TooManyActiveRequests
+        expr: sum(app_http_active_requests) > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Too many active requests"
+          description: "{{ $value }} active requests"
+

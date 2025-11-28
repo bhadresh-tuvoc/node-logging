@@ -52,7 +52,7 @@ Environment variables (`.env`):
 ```env
 # Application
 NODE_ENV=development
-PORT=3000
+PORT=4000
 APP_NAME=node-production-app
 APP_VERSION=1.0.0
 
@@ -237,50 +237,50 @@ src/
 ### 1. Memory Leak Detection
 ```bash
 # Start memory leak
-curl -X POST http://localhost:3000/debug/memory-leak/start \
+curl -X POST http://localhost:4000/debug/memory-leak/start \
   -H "Content-Type: application/json" \
   -d '{"sizeMB": 10, "intervalMs": 1000}'
 
 # Check status
-curl http://localhost:3000/debug/memory-leak/status
+curl http://localhost:4000/debug/memory-leak/status
 
 # Watch memory grow in metrics
-curl http://localhost:3000/metrics | grep memory
+curl http://localhost:4000/metrics | grep memory
 
 # Stop and cleanup
-curl -X POST http://localhost:3000/debug/memory-leak/stop
+curl -X POST http://localhost:4000/debug/memory-leak/stop
 ```
 
 ### 2. CPU Spike
 ```bash
-curl -X POST http://localhost:3000/debug/cpu-intensive \
+curl -X POST http://localhost:4000/debug/cpu-intensive \
   -H "Content-Type: application/json" \
   -d '{"iterations": 10000000}'
 ```
 
 ### 3. Slow Requests
 ```bash
-curl "http://localhost:3000/debug/slow-endpoint?delay=5000"
+curl "http://localhost:4000/debug/slow-endpoint?delay=5000"
 ```
 
 ### 4. Error Simulation
 ```bash
 # Database error
-curl -X POST http://localhost:3000/debug/error/database
+curl -X POST http://localhost:4000/debug/error/database
 
 # Validation error
-curl -X POST http://localhost:3000/debug/error/validation
+curl -X POST http://localhost:4000/debug/error/validation
 
 # Unhandled error
-curl -X POST http://localhost:3000/debug/error/unhandled
+curl -X POST http://localhost:4000/debug/error/unhandled
 
 # Cascade failure
-curl -X POST http://localhost:3000/debug/cascade-failure
+curl -X POST http://localhost:4000/debug/cascade-failure
 ```
 
 ### 5. High Concurrency
 ```bash
-curl -X POST http://localhost:3000/debug/high-concurrency \
+curl -X POST http://localhost:4000/debug/high-concurrency \
   -H "Content-Type: application/json" \
   -d '{"concurrent": 100, "operationMs": 100}'
 ```
@@ -342,7 +342,7 @@ readinessProbe:
 
 ### Create User
 ```bash
-curl -X POST http://localhost:3000/api/users \
+curl -X POST http://localhost:4000/api/users \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -354,35 +354,78 @@ curl -X POST http://localhost:3000/api/users \
 
 ### List Users
 ```bash
-curl "http://localhost:3000/api/users?page=1&limit=10&status=active"
+curl "http://localhost:4000/api/users?page=1&limit=10&status=active"
 ```
 
 ### Get User
 ```bash
-curl http://localhost:3000/api/users/{user-id}
+curl http://localhost:4000/api/users/{user-id}
 ```
 
 ### Update User
 ```bash
-curl -X PUT http://localhost:3000/api/users/{user-id} \
+curl -X PUT http://localhost:4000/api/users/{user-id} \
   -H "Content-Type: application/json" \
   -d '{"name": "Jane Doe", "status": "inactive"}'
 ```
 
 ### Delete User
 ```bash
-curl -X DELETE http://localhost:3000/api/users/{user-id}
+curl -X DELETE http://localhost:4000/api/users/{user-id}
 ```
 
-## 📊 Monitoring Setup
+## 📊 Monitoring Setup with Grafana
 
-### Prometheus + Grafana
+### Quick Start (Docker Required)
+
+```bash
+# Make sure your Node.js app is running on port 4000
+npm start
+
+# Start Prometheus & Grafana
+docker compose up -d
+
+# Access:
+# - Prometheus: http://localhost:9090
+# - Grafana: http://localhost:4002 (admin/admin123)
+```
+
+### What's Included
+
+The monitoring setup includes:
+- **Prometheus** - Metrics collection (port 9090)
+- **Grafana** - Visualization dashboards (port 4002)
+- **Pre-configured Dashboard** - Ready-to-use Node.js monitoring dashboard
+- **Alert Rules** - Predefined alerts for common issues
+
+### Grafana Dashboard Features
+
+The pre-configured dashboard shows:
+
+| Panel | Description |
+|-------|-------------|
+| Heap Usage % | Memory pressure indicator |
+| Active Requests | Current concurrent requests |
+| Request Rate | Requests per second |
+| Error Rate | Errors per second |
+| P95 Latency | 95th percentile response time |
+| Uptime | Application uptime |
+| Request Rate by Status | 2xx, 4xx, 5xx breakdown |
+| Response Time Percentiles | P50, P90, P95, P99 |
+| Memory Usage | Heap, RSS, External |
+| Event Loop Lag | Node.js event loop health |
+| CPU Usage | Process CPU utilization |
+| Database Query Duration | Query performance |
+| User Operations | Business metrics |
+| Health Status | Component health |
+
+### Manual Prometheus Setup
 ```yaml
 # prometheus.yml
 scrape_configs:
   - job_name: 'node-app'
     static_configs:
-      - targets: ['localhost:3000']
+      - targets: ['localhost:4000']
     metrics_path: '/metrics'
 ```
 
